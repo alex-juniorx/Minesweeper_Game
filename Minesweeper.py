@@ -1,9 +1,8 @@
 #MINESWEEPER GAME (9x9 Board, 10 Bombs)
 
-from random import randint
-
 #1 Creating a null board game:
 board = []
+
 for i in range(9):
     board.append(["="]*9)
 
@@ -22,7 +21,10 @@ def print_board(given_board):
 print_board(board)
 
 #3 Generating the position of the ten bombs (ensuring non-duplicate values):
+from random import randint
+
 bombs_position = []
+
 for i in range(10):
     temp_position = [randint(0, len(board)-1), randint(0, len(board)-1)]
     while temp_position in bombs_position:
@@ -31,14 +33,56 @@ for i in range(10):
 
 print(bombs_position)
 
-#4 Creating the solution board for reference (it will be hidden from the player):
+#4 Creating the solution board for reference along the game (it will be hidden from the player):
 solution = []
+
     #4.1 Placing a default value "=" in the initial positions:
 for i in range(9):
     solution.append(["="]*9)
+    
     #4.2 Placing "#" values in the defined bomb positions:
 for bomb in bombs_position:
     solution[bomb[0]][bomb[1]] = "#"
+    
+    
+    #4.3 Placing the number of neighboring bombs in all positions, except for bomb positions.
+for row in range(9):
+    for column in range(9):
+        bomb_count = 0
+        if solution[row][column] == "#":
+            continue
+        else:
+            for neighboring_row in range(row-1, row+2):
+                for neighboring_column in range(column-1, column+2):
+                    if neighboring_row == -1 or neighboring_row == 9 or neighboring_column == -1 or neighboring_column == 9:
+                        continue
+                    elif solution[neighboring_row][neighboring_column] == "#":
+                        bomb_count += 1
+            solution[row][column] = str(bomb_count)    
+    
+#5 Function created to reveal "0" locations, when a neighboring "0" is revealed by the player
+def reveal_zeros():    
+    #Obs.: While a new "0" is revealed, the loop should repeat
+    repeat = True
+    while repeat == True:
+        repeat = False
+        for row in range(9):
+            for column in range(9):
+                #if the location is different from "0" or is already revealed, it's not relevant for the loop.
+                if solution[row][column] != "0" or board[row][column] == "0":
+                    continue
+                else:
+                    for neighboring_row in range(row-1, row+2):
+                        for neighboring_column in range(column-1, column+2):
+                            if neighboring_row == -1 or neighboring_row == 9 or neighboring_column == -1 or neighboring_column == 9:
+                                continue
+                            elif board[neighboring_row][neighboring_column] == "0":
+                                board[row][column] = "0"
+                                repeat = True
+                                break
+     #DÚVIDA: A FUNÇÃO PRECISA RETORNAR O BOARD PARA EU ACESSAR OS VALORES ATUAIS DE BOARD FORA DA FUNÇÃO?
+    
+    
     #4.3 Placing the number of neighboring bombs in all positions.
 for row in range(9):
     for column in range(9):
