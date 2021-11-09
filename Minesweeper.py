@@ -96,6 +96,55 @@ for row in range(9):
         
 print_board(solution)
 
+#Creating a function to reveal positions with zero neighboring bombs,
+# when another zero position is selected around it
+def reveal_zeros():
+    for row in range(9):
+        for column in range(9):
+            if solution[row][column] == "0":
+                if (
+                    (row > 0 and row < 8 and column > 0 and column < 8) and
+                    (("0" in board[row-1][column-1:column+2]) or
+                    ("0" in board[row][column-1:column+2]) or
+                    ("0" in board[row+1][column-1:column+2]))
+                ):
+                    board[row][column] = "0"
+                    
+                elif row == 0 and column == 0:
+                    zero_count += solution[row][column:column+2].count("#")
+                    zero_count += solution[row+1][column:column+2].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif row == 0 and column == 8:
+                    zero_count += solution[row][column-1:column+1].count("#")
+                    zero_count += solution[row+1][column-1:column+1].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif row == 8 and column == 8:
+                    zero_count += solution[row-1][column-1:column+1].count("#")
+                    zero_count += solution[row][column-1:column+1].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif row == 8 and column == 0:
+                    zero_count += solution[row-1][column:column+2].count("#")
+                    zero_count += solution[row][column:column+2].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif row == 0 and column != 0 and column != 8:
+                    zero_count += solution[row][column-1:column+2].count("#")
+                    zero_count += solution[row+1][column-1:column+2].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif row == 8 and column != 0 and column != 8:
+                    zero_count += solution[row-1][column-1:column+2].count("#")
+                    bomb_count += solution[row][column-1:column+2].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif column == 0 and row != 0 and row != 8:
+                    bomb_count += solution[row-1][column:column+2].count("#")
+                    bomb_count += solution[row][column:column+2].count("#")
+                    bomb_count += solution[row+1][column:column+2].count("#")
+                    solution[row][column] = str(bomb_count)
+                elif column == 8 and row != 0 and row != 8:
+                    bomb_count += solution[row-1][column-1:column+1].count("#")
+                    bomb_count += solution[row][column-1:column+1].count("#")
+                    bomb_count += solution[row+1][column-1:column+1].count("#")
+                    solution[row][column] = str(bomb_count)
+
 
 # Starting the game and initiating an interactive loop:
     #Obs.: A initial invalid input is given, only to start the loop.
