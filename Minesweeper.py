@@ -1,12 +1,16 @@
-#MINESWEEPER GAME (9x9 Board, 15 Bombs)
+#MINESWEEPER GAME
+#Game played on terminal on a 9x9 Board, with 16 Bombs, enumerated neighboring positions and final score (based on revealed positions and elapsed time)
 
-#1 Creating a null board game:
+import time
+from random import randint
+
+#1 INITIAL BOARD IS CREATED:
 board = []
 
 for i in range(9):
     board.append(["[ ]"]*9)
 
-#2 Function used to print the actual game board (with numbered rows and columns):
+#2 FUNCTION USED TO PRINT THE ACTUAL GAME BOARD (WITH NUMBERED ROWS AND COLUMNS):
 def print_board(given_board):
     # Numbering the columns:
     print("     0  1  2  3  4  5  6  7  8 ")
@@ -18,9 +22,7 @@ def print_board(given_board):
         print ("".join(row))
         count += 1
 
-#3 Generating the position of the ten bombs (ensuring non-duplicate values):
-from random import randint
-
+#3 BOMB POSITIONS ARE GENERATED (NON-DUPLICATE VALUES)::
 bombs_position = []
 
 for i in range(15):
@@ -29,18 +31,18 @@ for i in range(15):
         temp_position = [randint(0, len(board)-1), randint(0, len(board)-1)]
     bombs_position.append(temp_position)
 
-#4 Creating the solution board for reference along the game (it will be hidden from the player):
+#4 SOLUTION BOARD IS CREATED FOR REFERENCE ALONG THE GAME (IT IS HIDDEN FROM THE PLAYER):
 solution = []
 
-    #4.1 Placing a default value "[ ]" in the initial positions:
+    #4.1 Default value "[ ]" is positioned in the initial positions:
 for i in range(9):
     solution.append(["[ ]"]*9)
     
-    #4.2 Placing "[X]" values in the defined bomb positions:
+    #4.2 "[X]" values are placed in the defined bomb positions:
 for bomb in bombs_position:
     solution[bomb[0]][bomb[1]] = "[X]"
     
-    #4.3 Placing the number of neighboring bombs in all positions, except for bomb positions.
+    #4.3 Positions are enumerated based on neighboring bombs (except for bomb positions).
 for row in range(9):
     for column in range(9):
         bomb_count = 0
@@ -56,7 +58,7 @@ for row in range(9):
             solution[row][column] = "[" + str(bomb_count) + "]"
 print_board(solution) 
 
-#5 Function created to reveal "[0]" locations, when a neighboring "[0]" is revealed by the player
+#5 FUNCTION CREATED TO REVEAL "[0]" LOCATIONS, WHEN A NEIGHBORING "[0]" IS REVEALED BY THE PLAYER:
 def reveal_zeros():    
     #Obs.: While a new "[0]" is revealed, the loop should repeat
     repeat = True
@@ -76,21 +78,39 @@ def reveal_zeros():
                                 board[row][column] = "[0]"
                                 repeat = True
                                 break
-    
 
-#6 Starting the game and initiating an interactive loop:
+#6 FUNCTION USED TO CALCULATE THE FINAL SCORE BASED ON THE NUMBER OF REVEALED SAFE POSITIONS AND ELAPSED TIME
+def final_score(elapsed_time):
+    final_score = 0
+    for row in range(9):
+        for column in range(9):
+            if board[row][column] != "[X]" and board[row][column] != "[ ]":
+                final_score += 10
+    if elapsed_time < 60:
+        final_score += 350
+    elif elapsed_time < 120:
+        final_score += 250
+    elif elapsed_time < 180:
+        final_score += 150
+    elif elapsed_time < 240:
+        final_score += 50
+    return final_score
+
+
+#7 THE GAME’S INTERACTIVE LOOP IS INITIALIZED::
 print("______________________________________________________")
 print(" ")
 print("           WELCOME TO THE MINESWEEPER GAME!")
 print("______________________________________________________")
 print(" ")
 print_board(board)
-    #6.1 An initial invalid input is given, only to start the loop.
+    #7.1 The timer is started and an initial invalid input is given (only to start the loop):
+t0 = time.time()
 selected_r, selected_c = 9, 9
 
 while[selected_r, selected_c] not in bombs_position:
     print(".......................................................")
-    #6.2 Asking for the user's input and avoiding a bad entry error:
+    #7.2 User's input is demanded (bad entry error prevented):
     try:
         selected_r, selected_c = input("Go ahead buddy, select a valid \"row/column\" value: ").split("/")
         selected_r = int(selected_r)
@@ -117,9 +137,11 @@ while[selected_r, selected_c] not in bombs_position:
         print_board(board)
         print(" ")
         print("Ouch, you stepted on a bomb! :(")
+        elapsed_time = time.time() - t0
         print("__________________________________")
         print(" ")
         print("GAME OVER!")
+        print("FINAL SCORE: ", str(final_score(elapsed_time)))
         print("__________________________________")
         print(" ")
         break      
